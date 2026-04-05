@@ -7,6 +7,9 @@ import 'reward_screen.dart';
 import 'tambah_dana_screen.dart';
 import 'tips_info_screen.dart';
 import 'promo_screen.dart';
+import 'saku_utama/saku_utama_screen.dart';
+import 'layanan/cash_flow_screen.dart';
+import 'layanan/beli_bayar_screen.dart';
 import '../../api/banking.dart';
 import '../../models/account_detail.dart';
 
@@ -29,6 +32,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isBalanceVisible = true;
   AccountDetail? _primaryAccount;
+
+  Future<void> _refreshIfChanged(dynamic result) async {
+    if (result == true && mounted) {
+      await _runInitialHomeApi();
+    }
+  }
 
   @override
   void initState() {
@@ -355,16 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  TambahDanaScreen(
-                                                    accountName:
-                                                        _primaryAccount
-                                                            ?.username ??
-                                                        'Pengguna',
-                                                    accountNumber:
-                                                        _primaryAccount
-                                                            ?.accountnumber ??
-                                                        '-',
-                                                  ),
+                                                  const TambahDanaScreen(),
                                             ),
                                           );
                                         },
@@ -424,6 +424,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             _buildServiceItem(
                               imagePath: 'assets/images/IKEHome.png',
                               label: "Saku Utama",
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SakuUtamaScreen(),
+                                  ),
+                                );
+                                await _refreshIfChanged(result);
+                              },
                             ),
                             _buildServiceItem(
                               imagePath: 'assets/images/celengan.png',
@@ -439,10 +449,29 @@ class _HomeScreenState extends State<HomeScreen> {
                               imagePath: 'assets/images/CashF.png',
                               label: "Cash Flow",
                               iconSize: 38,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CashFlowScreen(),
+                                  ),
+                                );
+                              },
                             ),
+
                             _buildServiceItem(
                               imagePath: 'assets/images/bill.png',
                               label: "Beli & Bayar",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const BeliBayarScreen(),
+                                  ),
+                                );
+                              },
                             ),
                             _buildServiceItem(
                               imagePath: 'assets/images/CS.png',
@@ -617,31 +646,39 @@ class _HomeScreenState extends State<HomeScreen> {
     required String imagePath,
     required String label,
     double iconSize = 28,
+    VoidCallback? onTap,
   }) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 52,
-          decoration: const BoxDecoration(
-            color: Color(0xFFDCD6FF),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(10),
-              bottom: Radius.circular(25),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: Color(0xFFDCD6FF),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(10),
+                bottom: Radius.circular(25),
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Image.asset(
+              imagePath,
+              height: iconSize,
+              fit: BoxFit.contain,
             ),
           ),
-          alignment: Alignment.center,
-          child: Image.asset(imagePath, height: iconSize, fit: BoxFit.contain),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 16, color: Colors.black87),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+        ],
+      ),
     );
   }
 
