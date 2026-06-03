@@ -7,8 +7,10 @@ import '../models/wallet_source.dart';
 import 'package:http/http.dart' as http;
 
 class BankingService {
-  static const String baseUrl = 'http://192.168.0.113:8000/api/banking';
+  // static const String baseUrl = 'http://192.168.0.113:8000/api/banking';
   // static const String baseUrl = 'http://192.168.1.12:8000/api/banking';
+  static const String baseUrl = 'http://10.10.161.245:8000/api/banking';
+
   static final ValueNotifier<int> accountDataRevision = ValueNotifier<int>(0);
 
   static void notifyAccountDataChanged() {
@@ -929,22 +931,22 @@ class BankingService {
     });
   }
 
-  static Future<dynamic> checkRekening({
-    required String accountNumber,
-    String bankName = 'IKE Bank',
-  }) {
+  static Future<dynamic> checkRekening({required String accountNumber}) async {
     final url = Uri.parse("$baseUrl/check-rekening/");
-    return AuthService.authorizedPost(
+    final response = await AuthService.authorizedPost(
       url,
-      body: {'account_number': accountNumber, 'bank_name': bankName},
-    ).then((response) {
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(
-          'Failed to check rekening (HTTP ${response.statusCode}): ${response.body}',
-        );
-      }
-    });
+      body: jsonEncode({
+        'bank_name': 'IKE Bank',
+        'account_number': accountNumber,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(
+        'Failed to check rekening (HTTP ${response.statusCode}): ${response.body}',
+      );
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'riwayat_berhasil.dart';
 import '../../../api/banking.dart';
+import '../../../notif_service.dart';
 
 class RiwayatPinScreen extends StatefulWidget {
   final String namaPenerima;
@@ -78,7 +79,7 @@ class _RiwayatPinScreenState extends State<RiwayatPinScreen> {
     });
 
     try {
-      await BankingService.transferOut(
+      final response = await BankingService.transferOut(
         pin: pinValue,
         destinationAccount: widget.nomorRekening,
         amount: amountDigits,
@@ -88,6 +89,8 @@ class _RiwayatPinScreenState extends State<RiwayatPinScreen> {
       if (!mounted) {
         return;
       }
+
+      await _showTransactionNotification(response);
 
       Navigator.pushReplacement(
         context,
@@ -108,11 +111,14 @@ class _RiwayatPinScreenState extends State<RiwayatPinScreen> {
       final message = e
           .toString()
           .replaceFirst('Exception: ', '')
-          .replaceFirst(RegExp(r'^Failed to transfer out \(HTTP \d+\):\s*'), '');
+          .replaceFirst(
+            RegExp(r'^Failed to transfer out \(HTTP \d+\):\s*'),
+            '',
+          );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message.isEmpty ? 'Transfer gagal' : message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Gagal melakukan transfer.")));
 
       setState(() {
         _pin = '';
@@ -126,6 +132,39 @@ class _RiwayatPinScreenState extends State<RiwayatPinScreen> {
         });
       }
     }
+  }
+
+  String _formatRupiah(dynamic amount) {
+    final value = int.tryParse(amount.toString()) ?? 0;
+
+    return "Rp${value.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (match) => "${match[1]}.")}";
+  }
+
+  Future<void> _showTransactionNotification(Map data) async {
+    final category = data['category'] ?? '';
+    final merchant =
+        data['merchant_name'] ?? (data['recipient_account_name'] ?? 'Penerima');
+    final amount = data['amount'] ?? 0;
+
+    String title;
+    String body;
+
+    if (category == 'payment') {
+      title = "Pembayaran Berhasil";
+      body = "${_formatRupiah(amount)} di $merchant";
+    } else if (category == 'Transfer Out') {
+      title = "Transfer Berhasil";
+      body = "${_formatRupiah(amount)} ke $merchant";
+    } else {
+      title = "Transaksi Berhasil";
+      body = "${_formatRupiah(amount)} di $merchant";
+    }
+
+    await NotifService().showNotification(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: title,
+      body: body,
+    );
   }
 
   @override

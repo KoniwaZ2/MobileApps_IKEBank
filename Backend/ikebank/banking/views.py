@@ -187,6 +187,8 @@ class AccountDetailsView(APIView):
                 'card_number': account.card_number,
                 'balance': str(account.balance),
                 'qris_limit': account.qris_limit,
+                'block': account.block,
+                'created_at': account.created_at,
             })
         return Response(data, status=status.HTTP_200_OK)
 
@@ -462,6 +464,12 @@ class TransactionCreateView(APIView):
                 'new_balance': account.balance,
                 'saku_balance': saku_utama.balance,
                 'transaction_time': sender_transaction.timestamp,
+                'category': sender_transaction.category,
+                'description': sender_transaction.description,
+                'source_funds': sender_transaction.source_funds,
+                'merchant_name': sender_transaction.merchant_name_snapshot,
+                'recipient_account_name': destination_account.user.name if destination_account else None,
+                'amount': str(sender_transaction.amount),
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -704,7 +712,8 @@ class InternalTransferView(APIView):
                     'name': destination_saku.saku_name,
                     'balance': destination_saku.balance
                 },
-                'amount_transferred': amount
+                'amount_transferred': amount,
+                'category': transaction_out.category,
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
