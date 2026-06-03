@@ -79,22 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
               : null;
         });
       }
-
-      if (widget.entrySource == HomeEntrySource.register) {
-        if (!mounted) {
-          return;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Akun berhasil dibuat!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        if (!mounted) {
-          return;
-        }
-      }
     } catch (e) {
       if (!mounted) {
         return;
@@ -511,49 +495,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 4),
                     Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Promo buat kamu 👀",
-                          style: alumniSansBold.copyWith(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const PromoScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Lihat Semua",
-                            style: TextStyle(
-                              color: AppColors.primaryOrange,
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Promo buat kamu 👀",
+                            style: alumniSansBold.copyWith(
                               fontSize: 18,
+                              color: Colors.black,
                             ),
                           ),
-                        ),
-                      ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const PromoScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Lihat Semua",
+                              style: TextStyle(
+                                color: AppColors.primaryOrange,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 90,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 2,
-                      itemBuilder: (context, index) {
-                        return _buildPromoCard();
-                      },
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 90,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 2,
+                        itemBuilder: (context, index) {
+                          return _buildPromoCard();
+                        },
+                      ),
                     ),
-                  ),
 
                     const SizedBox(height: 14),
 
